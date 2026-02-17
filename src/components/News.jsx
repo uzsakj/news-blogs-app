@@ -7,6 +7,7 @@ import axios from 'axios'
 import Weather from './Weather'
 import Calendar from './Calendar'
 import NewsModal from './NewsModal'
+import Bookmarks from './Bookmarks'
 
 const categories = [
     'general',
@@ -141,6 +142,7 @@ const News = () => {
                     article={selectedArticle}
                     onClose={() => setShowModal(false)}
                 />
+                <Bookmarks />
                 <div className="my-blogs">My Blogs</div>
                 <div className="weather-calendar">
                     <Weather />
