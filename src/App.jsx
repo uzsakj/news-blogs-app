@@ -1,11 +1,13 @@
 import React from 'react'
 import News from './components/News'
+import Blogs from './components/Blogs'
 
 const App = () => {
   return (
     <div className='container'>
-      <div className="news-blog-app">
-        <News />
+      <div className="news-blogs-app">
+        {/* <News /> */}
+        <Blogs />
       </div>
     </div>
   )
