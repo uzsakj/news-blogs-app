@@ -1,11 +1,12 @@
 import React from 'react'
-import Weather from './Weather'
-import Calendar from './Calendar'
+import { useState, useEffect } from 'react';
 import './News.css'
 import userImg from '../assets/images/user.jpg'
 import noImage from '../assets/images/no-img.png'
 import axios from 'axios'
-import { useState, useEffect } from 'react';
+import Weather from './Weather'
+import Calendar from './Calendar'
+import NewsModal from './NewsModal'
 
 const categories = [
     'general',
@@ -25,6 +26,9 @@ const News = () => {
     const [selectedCategory, setSelectedCategory] = useState('general');
     const [searchInput, setSearchInput] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [selectedArticle, setSelectedArticle] = useState(null);
+
 
 
     useEffect(() => {
@@ -58,6 +62,11 @@ const News = () => {
         e.preventDefault();
         setSearchQuery(searchInput);
         setSearchInput('');
+    }
+
+    const handleArticleClick = (article) => {
+        setSelectedArticle(article);
+        setShowModal(true);
     }
 
     return (
@@ -101,7 +110,10 @@ const News = () => {
                 </div>
                 <div className="news-section">
                     {headline && (
-                        <div className="headline">
+                        <div
+                            className="headline"
+                            onClick={() => handleArticleClick(headline)}
+                        >
                             <img src={headline?.image} alt={headline?.title} />
                             <h2 className='headline-title'>
                                 {headline?.title}
@@ -111,7 +123,11 @@ const News = () => {
                     )}
                     <div className="news-grid">
                         {news.map((article, index) => (
-                            <div className="news-grid-item" key={index}>
+                            <div
+                                className="news-grid-item"
+                                key={index}
+                                onClick={() => handleArticleClick(article)}
+                            >
                                 <img src={article.image || noImage} alt={article.title} />
                                 <h3>{article.title}</h3>
                                 <i className="fa-regular fa-bookmark bookmark"></i>
@@ -120,6 +136,11 @@ const News = () => {
 
                     </div>
                 </div>
+                <NewsModal
+                    showModal={showModal}
+                    article={selectedArticle}
+                    onClose={() => setShowModal(false)}
+                />
                 <div className="my-blogs">My Blogs</div>
                 <div className="weather-calendar">
                     <Weather />
