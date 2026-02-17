@@ -23,10 +23,18 @@ const News = () => {
     const [headline, setHeadline] = useState(null);
     const [news, setNews] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('general');
+    const [searchInput, setSearchInput] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+
 
     useEffect(() => {
         const fetchNews = async () => {
-            const url = `https://gnews.io/api/v4/top-headlines?category=${selectedCategory}&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`;
+            let url = `https://gnews.io/api/v4/top-headlines?category=${selectedCategory}&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`;
+
+            if (searchQuery) {
+                url = `https://gnews.io/api/v4/search?q=${searchQuery}&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`;
+            }
+
             const response = await axios.get(url);
             const fetchedNews = response.data.articles;
 
@@ -40,11 +48,16 @@ const News = () => {
             setNews(fetchedNews.slice(1, 7));
         }
         fetchNews();
-    }, [selectedCategory]);
+    }, [selectedCategory, searchQuery]);
 
     const handleCategoryChange = (e, category) => {
         e.preventDefault();
         setSelectedCategory(category);
+    }
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setSearchQuery(searchInput);
+        setSearchInput('');
     }
 
     return (
@@ -52,8 +65,12 @@ const News = () => {
             <header className='news-header'>
                 <h1 className='logo'>News & Blogs</h1>
                 <div className="search-bar">
-                    <form>
-                        <input type="text" placeholder='Search News...' />
+                    <form onSubmit={handleSearch}>
+                        <input
+                            type="text"
+                            placeholder='Search News...'
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)} />
                         <button type='submit'>
                             <i className="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -70,7 +87,13 @@ const News = () => {
                         <h1 className='nav-heading'>Categories</h1>
                         <div className="nav-linnks">
                             {categories.map((category) => (
-                                <a href="" className='nav-link' key={category} onClick={(e) => handleCategoryChange(e, category)}> {category}</a>
+                                <a
+                                    href=""
+                                    className='nav-link'
+                                    key={category}
+                                    onClick={(e) => handleCategoryChange(e, category)}>
+                                    {category}
+                                </a>
                             ))}
                             <a href="" className='nav-link'> Bookmarks <i className="fa-regular fa-bookmark"></i></a>
                         </div>
