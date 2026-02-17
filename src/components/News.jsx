@@ -22,6 +22,9 @@ const categories = [
 ];
 
 const News = () => {
+    const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
+
+
     const [headline, setHeadline] = useState(null);
     const [news, setNews] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('general');
@@ -36,10 +39,10 @@ const News = () => {
 
     useEffect(() => {
         const fetchNews = async () => {
-            let url = `https://gnews.io/api/v4/top-headlines?category=${selectedCategory}&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`;
+            let url = `https://gnews.io/api/v4/top-headlines?category=${selectedCategory}&lang=en&apikey=${apiKey}`;
 
             if (searchQuery) {
-                url = `https://gnews.io/api/v4/search?q=${searchQuery}&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`;
+                url = `https://gnews.io/api/v4/search?q=${searchQuery}&apikey=${apiKey}`;
             }
 
             const response = await axios.get(url);
