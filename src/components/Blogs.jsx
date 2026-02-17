@@ -1,8 +1,12 @@
 import React from 'react'
 import userImg from '../assets/images/user.jpg'
 import './Blogs.css'
+import { useState } from 'react';
 
-const Blogs = () => {
+const Blogs = ({ onBack }) => {
+
+    const [showForm, setShowForm] = useState(false);
+
     return (
         <div className='blogs'>
             <div className='blogs-left'>
@@ -10,8 +14,7 @@ const Blogs = () => {
                 <p>Mary's Blog</p>
             </div>
             <div className="blogs-right">
-                {/* <button className="post-btn">Create New Post</button> */}
-                <div className="blogs-right-form">
+                {showForm ? (<div className="blogs-right-form">
                     <h1>New Post</h1>
                     <form>
                         <div className="img-upload">
@@ -24,8 +27,11 @@ const Blogs = () => {
                         <textarea placeholder='Add Text' className='text-input' ></textarea>
                         <button type="submit" className='submit-btn'>Submit Button</button>
                     </form>
-                </div>
-                <button className="blogs-close-btn">
+                </div>) : (
+                    <button className="post-btn" onClick={() => setShowForm(true)}>Create New Post</button>
+                )}
+
+                <button className="blogs-close-btn" onClick={onBack}>
                     Back <i className="bx bx-chevron-right"></i>
                 </button>
             </div>

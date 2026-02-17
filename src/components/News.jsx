@@ -21,7 +21,7 @@ const categories = [
     'nation'
 ];
 
-const News = () => {
+const News = ({ onShowBlogs }) => {
     const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
 
 
@@ -111,7 +111,7 @@ const News = () => {
             </header>
             <div className="news-content">
                 <div className='navbar'>
-                    <div className="user">
+                    <div className="user" onClick={onShowBlogs}>
                         <img src={userImg} alt="User Image" />
                         <p>Mary's Blog</p>
                     </div>
