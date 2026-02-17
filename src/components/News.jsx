@@ -2,6 +2,7 @@ import React from 'react'
 import Weather from './Weather'
 import Calendar from './Calendar'
 import './News.css'
+import userImg from '../assets/images/user.jpg'
 
 const News = () => {
     return (
@@ -19,8 +20,25 @@ const News = () => {
             </header>
             <div className="news-content">
                 <div className='navbar'>
-                    <div className="user">User</div>
-                    <nav className="categories">Categories</nav>
+                    <div className="user">
+                        <img src={userImg} alt="User Image" />
+                        <p>Mary's Blog</p>
+                    </div>
+                    <nav className="categories">
+                        <h1 className='nav-heading'>Categories</h1>
+                        <div className="nav-linnks">
+                            <a href="" className='nav-link'> General</a>
+                            <a href="" className='nav-link'> World</a>
+                            <a href="" className='nav-link'> Business</a>
+                            <a href="" className='nav-link'> Technology</a>
+                            <a href="" className='nav-link'> Entertainment</a>
+                            <a href="" className='nav-link'> Sports</a>
+                            <a href="" className='nav-link'> Science</a>
+                            <a href="" className='nav-link'> Health</a>
+                            <a href="" className='nav-link'> Nation</a>
+                            <a href="" className='nav-link'> Bookmarks <i className="fa-regular fa-bookmark"></i></a>
+                        </div>
+                    </nav>
                 </div>
                 <div className="news-section">
                     <div className="headline">HeadLine</div>
