@@ -200,7 +200,14 @@ const News = () => {
                     <Calendar />
                 </div>
             </div>
-            <footer className='news-footer'> News Footer</footer>
+            <footer className='news-footer'>
+                <p>
+                    <span> News & Blogs App</span>
+                </p>
+                <p>
+                    &copy; All rights reserved. By József Uzsák - 2026
+                </p>
+            </footer>
         </div>
     )
 }
