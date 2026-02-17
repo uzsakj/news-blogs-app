@@ -8,6 +8,9 @@ import Weather from './Weather'
 import Calendar from './Calendar'
 import NewsModal from './NewsModal'
 import Bookmarks from './Bookmarks'
+import blogImage1 from '../assets/images/blog1.jpg'
+import blogImage2 from '../assets/images/blog2.jpg'
+import blogImage3 from '../assets/images/blog3.jpg'
 
 const categories = [
     'general',
@@ -194,7 +197,52 @@ const News = ({ onShowBlogs }) => {
                     onSelectArticle={handleArticleClick}
                     onDeleteBookmark={handleBookmarkClick}
                 />
-                <div className="my-blogs">My Blogs</div>
+                <div className="my-blogs">
+                    <h1 className="my-blogs-heading">My Blogs</h1>
+                    <div className="blog-posts">
+                        <div className="blog-post">
+                            <img src={blogImage1} alt="Post Image" />
+                            <h3>Blog Post Title</h3>
+                            <div className="post-buttons">
+                                <button className="edit-post">
+                                    <i className="bx bxs-edit"></i>
+                                </button>
+                                <button className="delete-post" >
+                                    <i className="bx bxs-x-circle"></i>
+                                </button>
+
+                            </div>
+                        </div>
+                        <div className="blog-post">
+                            <img src={blogImage2} alt="Post Image" />
+                            <h3>Blog Post Title</h3>
+                            <div className="post-buttons">
+                                <button className="edit-post">
+                                    <i className="bx bxs-edit"></i>
+                                </button>
+                                <button className="delete-post" >
+                                    <i className="bx bxs-x-circle"></i>
+                                </button>
+
+                            </div>
+                        </div>
+                        <div className="blog-post">
+                            <img src={blogImage3} alt="Post Image" />
+                            <h3>Blog Post Title</h3>
+                            <div className="post-buttons">
+                                <button className="edit-post">
+                                    <i className="bx bxs-edit"></i>
+                                </button>
+                                <button className="delete-post" >
+                                    <i className="bx bxs-x-circle"></i>
+                                </button>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
                 <div className="weather-calendar">
                     <Weather />
                     <Calendar />
