@@ -70,7 +70,7 @@ const Weather = () => {
                 <div className="not-found">Location not found</div>
             ) : (
                 <div className="weather-data">
-                    <img src={data.current?.condition?.icon || ''} alt="weather icon" />
+                    <img src={data.current?.condition?.icon || null} alt="weather icon" />
                     <div className="weather-type">{data.current?.condition?.text || ''}</div>
                     <div className="temp">{data.current?.temp_c || ''}°</div>
                 </div>
