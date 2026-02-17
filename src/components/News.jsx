@@ -53,6 +53,11 @@ const News = () => {
 
             setHeadline(fetchedNews[0]);
             setNews(fetchedNews.slice(1, 7));
+
+            const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+            if (savedBookmarks) {
+                setBookmarks(savedBookmarks);
+            }
         }
         fetchNews();
     }, [selectedCategory, searchQuery]);
@@ -77,6 +82,8 @@ const News = () => {
             const updatedBookmarks =
                 prevBookmarks.find(bookmark => bookmark.title === article.title) ?
                     prevBookmarks.filter(bookmark => bookmark.title !== article.title) : [...prevBookmarks, article];
+
+            localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
             return updatedBookmarks;
         });
     }
