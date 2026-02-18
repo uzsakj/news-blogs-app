@@ -12,7 +12,7 @@ const Weather = () => {
         const fetchDefaultWeather = async () => {
             setIsLoading(true);
             const defaultLocation = 'New York';
-            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${defaultLocation}&aqi=no`;
+            const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${defaultLocation}&aqi=no`;
             const response = await axios.get(url);
             setIsLoading(false);
             const defaultData = await response.data;
@@ -28,7 +28,7 @@ const Weather = () => {
     const search = async () => {
         if (location.trim() !== '') {
             setIsLoading(true);
-            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
+            const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
             try {
                 const response = await axios.get(url);
                 setIsLoading(false);
