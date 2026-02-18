@@ -11,16 +11,16 @@ import Bookmarks from './Bookmarks'
 import BlogsModal from './BlogsModal'
 import { showBlogModal, deleteBlog } from '../store/blogSlice'
 import {
-  setSelectedCategory,
-  setSearchQuery,
-  setSearchInput,
-  clearSearchInput,
+    setSelectedCategory,
+    setSearchQuery,
+    setSearchInput,
+    clearSearchInput,
 } from '../store/newsSlice'
 import { useGetNewsQuery } from '../store/newsApi'
 import {
-  toggleBookmark,
-  showBookmarksModal as openBookmarksModal,
-  hideBookmarksModal,
+    toggleBookmark,
+    showBookmarksModal as openBookmarksModal,
+    hideBookmarksModal,
 } from '../store/bookmarksSlice'
 
 const categories = [

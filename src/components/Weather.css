@@ -87,3 +87,17 @@
     color: #ddd;
     margin-bottom: 12rem;
 }
+
+@media (max-width: 900px) {
+    .weather {
+        height: 100%;
+    }
+
+    .search {
+        width: 100%;
+    }
+
+    .search-location input {
+        width: 90%;
+    }
+}
