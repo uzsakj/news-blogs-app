@@ -1,14 +1,27 @@
 import React from 'react'
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import './News.css'
 import userImg from '../assets/images/user.jpg'
 import noImage from '../assets/images/no-img.png'
-import axios from 'axios'
 import Weather from './Weather'
 import Calendar from './Calendar'
 import NewsModal from './NewsModal'
 import Bookmarks from './Bookmarks'
 import BlogsModal from './BlogsModal'
+import { showBlogModal, deleteBlog } from '../store/blogSlice'
+import {
+  fetchNews,
+  setSelectedCategory,
+  setSearchQuery,
+  setSearchInput,
+  clearSearchInput,
+} from '../store/newsSlice'
+import {
+  toggleBookmark,
+  showBookmarksModal as openBookmarksModal,
+  hideBookmarksModal,
+} from '../store/bookmarksSlice'
 
 const categories = [
     'general',
@@ -22,60 +35,44 @@ const categories = [
     'nation'
 ];
 
-const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, onDeleteBlog }) => {
+const News = ({ onShowBlogs, onEditBlog }) => {
+    const dispatch = useDispatch();
+    const blogs = useSelector((state) => state.blogs.blogs);
+    const showBlogsModal = useSelector((state) => state.blogs.showBlogsModal);
+    const headline = useSelector((state) => state.news.headline);
+    const news = useSelector((state) => state.news.news);
+    const selectedCategory = useSelector((state) => state.news.selectedCategory);
+    const searchInput = useSelector((state) => state.news.searchInput);
+    const searchQuery = useSelector((state) => state.news.searchQuery);
+    const loading = useSelector((state) => state.news.loading);
+    const error = useSelector((state) => state.news.error);
     const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
 
-
-    const [headline, setHeadline] = useState(null);
-    const [news, setNews] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('general');
-    const [searchInput, setSearchInput] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [selectedArticle, setSelectedArticle] = useState(null);
-    const [bookmarks, setBookmarks] = useState([]);
-    const [showBookmarksModal, setShowBookmarksModal] = useState(false);
-    const [showBlogsModal, setShowBlogsModal] = useState(false);
-
-
+    const bookmarks = useSelector((state) => state.bookmarks.bookmarks);
+    const showBookmarksModal = useSelector((state) => state.bookmarks.showBookmarksModal);
 
     useEffect(() => {
-        const fetchNews = async () => {
-            let url = `https://gnews.io/api/v4/top-headlines?category=${selectedCategory}&lang=en&apikey=${apiKey}`;
-
-            if (searchQuery) {
-                url = `https://gnews.io/api/v4/search?q=${searchQuery}&apikey=${apiKey}`;
-            }
-
-            const response = await axios.get(url);
-            const fetchedNews = response.data.articles;
-
-            fetchedNews.forEach(article => {
-                if (!article.image) {
-                    article.image = noImage;
-                }
-            });
-
-            setHeadline(fetchedNews[0]);
-            setNews(fetchedNews.slice(1, 7));
-
-            const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
-            if (savedBookmarks) {
-                setBookmarks(savedBookmarks);
-            }
-        }
-        fetchNews();
-    }, [selectedCategory, searchQuery]);
+        if (!apiKey) return;
+        dispatch(fetchNews({
+            category: selectedCategory,
+            searchQuery,
+            apiKey,
+            noImage,
+        }));
+    }, [dispatch, selectedCategory, searchQuery, apiKey]);
 
     const handleCategoryChange = (e, category) => {
         e.preventDefault();
-        setSelectedCategory(category);
-    }
+        dispatch(setSelectedCategory(category));
+    };
+
     const handleSearch = (e) => {
         e.preventDefault();
-        setSearchQuery(searchInput);
-        setSearchInput('');
-    }
+        dispatch(setSearchQuery(searchInput));
+        dispatch(clearSearchInput());
+    };
 
     const handleArticleClick = (article) => {
         setSelectedArticle(article);
@@ -83,27 +80,13 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
     }
 
     const handleBookmarkClick = (article) => {
-        setBookmarks((prevBookmarks) => {
-            const updatedBookmarks =
-                prevBookmarks.find(bookmark => bookmark.title === article.title) ?
-                    prevBookmarks.filter(bookmark => bookmark.title !== article.title) : [...prevBookmarks, article];
-
-            localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
-            return updatedBookmarks;
-        });
-    }
+        dispatch(toggleBookmark(article));
+    };
 
 
     const handleBlogClick = (blog) => {
-        setSelectedBlog(blog);
-        setShowBlogsModal(true);
+        dispatch(showBlogModal(blog));
     }
-
-    const closeBlogModal = () => {
-        setShowBlogsModal(false);
-        setSelectedBlog(null);
-    }
-
 
     return (
         <div className='news'>
@@ -115,7 +98,7 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                             type="text"
                             placeholder='Search News...'
                             value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)} />
+                            onChange={(e) => dispatch(setSearchInput(e.target.value))} />
                         <button type='submit'>
                             <i className="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -130,7 +113,7 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                     </div>
                     <nav className="categories">
                         <h1 className='nav-heading'>Categories</h1>
-                        <div className="nav-linnks">
+                        <div className="nav-links">
                             {categories.map((category) => (
                                 <a
                                     href="#"
@@ -143,14 +126,20 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                             <a
                                 href="#"
                                 className='nav-link'
-                                onClick={() => setShowBookmarksModal(true)}>
+                                onClick={() => dispatch(openBookmarksModal())}>
                                 Bookmarks <i className="fa-solid fa-bookmark"></i>
                             </a>
                         </div>
                     </nav>
                 </div>
                 <div className="news-section">
-                    {headline && (
+                    {loading && (
+                        <div className="news-loading">Loading news...</div>
+                    )}
+                    {error && (
+                        <div className="news-error">{error}</div>
+                    )}
+                    {!loading && !error && headline && (
                         <div
                             className="headline"
                             onClick={() => handleArticleClick(headline)}
@@ -172,7 +161,7 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                         </div>
                     )}
                     <div className="news-grid">
-                        {news.map((article, index) => (
+                        {!loading && !error && news.map((article, index) => (
                             <div
                                 className="news-grid-item"
                                 key={index}
@@ -202,25 +191,24 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                 />
                 <Bookmarks
                     show={showBookmarksModal}
-                    bookmarks={bookmarks}
-                    onClose={() => setShowBookmarksModal(false)}
+                    onClose={() => dispatch(hideBookmarksModal())}
                     onSelectArticle={handleArticleClick}
-                    onDeleteBookmark={handleBookmarkClick}
                 />
                 <div className="my-blogs">
                     <h1 className="my-blogs-heading">My Blogs</h1>
                     <div className="blog-posts">
-                        {blogs.map((blog, index) => (
+                        {blogs.map((blog) => (
                             <div
                                 className="blog-post"
-                                key={index}
+                                key={blog.id}
                                 onClick={() => handleBlogClick(blog)}>
                                 <img src={blog.image || noImage} alt="Post Image" />
                                 <h3>{blog.title}</h3>
                                 <div className="post-buttons">
                                     <button
                                         className="edit-post"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.stopPropagation();
                                             onEditBlog(blog);
                                         }}>
                                         <i className="bx bxs-edit"></i>
@@ -229,7 +217,7 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                                         className="delete-post"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onDeleteBlog(blog);
+                                            dispatch(deleteBlog(blog));
                                         }}>
                                         <i className="bx bxs-x-circle"></i>
                                     </button>
@@ -239,13 +227,7 @@ const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, o
                         ))}
 
                     </div>
-                    {selectedBlog && showBlogsModal && (
-                        <BlogsModal
-                            show={showBlogsModal}
-                            blog={selectedBlog}
-                            onClose={closeBlogModal}
-                        />
-                    )}
+                    {showBlogsModal && <BlogsModal />}
                 </div>
                 <div className="weather-calendar">
                     <Weather />

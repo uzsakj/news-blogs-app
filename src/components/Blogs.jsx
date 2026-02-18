@@ -1,10 +1,15 @@
 import React from 'react'
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import './Blogs.css'
 import userImg from '../assets/images/user.jpg'
 import noImage from '../assets/images/no-img.png'
+import { addBlog, updateBlog } from '../store/blogSlice'
 
-const Blogs = ({ onBack, onCreateBlog, editBlog, isEditing }) => {
+const Blogs = ({ onBack }) => {
+    const dispatch = useDispatch();
+    const editBlog = useSelector((state) => state.blogs.selectedBlog);
+    const isEditing = useSelector((state) => state.blogs.isEditing);
 
     const [showForm, setShowForm] = useState(!!(editBlog && isEditing));
     const [image, setImage] = useState(editBlog?.image ?? null);
@@ -13,6 +18,13 @@ const Blogs = ({ onBack, onCreateBlog, editBlog, isEditing }) => {
     const [submitted, setSubmitted] = useState(false);
     const [titleValid, setTitleValid] = useState(true);
     const [contentValid, setContentValid] = useState(true);
+    const submitTimeoutRef = useRef(null);
+
+    useEffect(() => {
+        return () => {
+            if (submitTimeoutRef.current) clearTimeout(submitTimeoutRef.current);
+        };
+    }, []);
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -56,13 +68,17 @@ const Blogs = ({ onBack, onCreateBlog, editBlog, isEditing }) => {
             title,
             content
         }
-        onCreateBlog(newBlog, isEditing);
+        if (isEditing) {
+            dispatch(updateBlog(newBlog));
+        } else {
+            dispatch(addBlog(newBlog));
+        }
         setImage(null);
         setTitle('');
         setContent('');
         setShowForm(false);
         setSubmitted(true);
-        setTimeout(() => {
+        submitTimeoutRef.current = setTimeout(() => {
             setSubmitted(false);
             onBack();
         }, 3000);
