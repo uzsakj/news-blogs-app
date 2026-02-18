@@ -80,7 +80,12 @@ const News = ({ onShowBlogs, onEditBlog }) => {
 
     const handleBlogClick = (blog) => {
         dispatch(showBlogModal(blog));
-    }
+    };
+
+    const isBookmarked = (article) =>
+        bookmarks.some((b) =>
+            (b.url && article.url ? b.url === article.url : b.title === article.title)
+        );
 
     return (
         <div className='news'>
@@ -142,7 +147,7 @@ const News = ({ onShowBlogs, onEditBlog }) => {
                             <h2 className='headline-title'>
                                 {headline?.title}
                                 <i
-                                    className={`${bookmarks.some(bookmark => bookmark.title === headline.title)
+                                    className={`${isBookmarked(headline)
                                         ? 'fa-solid'
                                         : 'fa-regular'
                                         } fa-bookmark bookmark`}
@@ -158,13 +163,13 @@ const News = ({ onShowBlogs, onEditBlog }) => {
                         {!loading && !isError && news.map((article, index) => (
                             <div
                                 className="news-grid-item"
-                                key={index}
+                                key={article.url ?? article.title ?? index}
                                 onClick={() => handleArticleClick(article)}
                             >
                                 <img src={article.image || noImage} alt={article.title} />
                                 <h3>{article.title}</h3>
                                 <i
-                                    className={`${bookmarks.some(bookmark => bookmark.title === article.title)
+                                    className={`${isBookmarked(article)
                                         ? 'fa-solid'
                                         : 'fa-regular'
                                         } fa-bookmark bookmark`}

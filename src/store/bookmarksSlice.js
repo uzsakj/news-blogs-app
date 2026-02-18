@@ -11,16 +11,23 @@ const bookmarksSlice = createSlice({
   reducers: {
     toggleBookmark: (state, action) => {
       const article = action.payload;
-      const existing = state.bookmarks.find((b) => b.title === article.title);
-      if (existing) {
-        state.bookmarks = state.bookmarks.filter((b) => b.title !== article.title);
+      const match = (b) =>
+        (b.url && article.url ? b.url === article.url : b.title === article.title);
+      const index = state.bookmarks.findIndex(match);
+      if (index !== -1) {
+        state.bookmarks.splice(index, 1);
       } else {
         state.bookmarks.push(article);
       }
     },
     removeBookmark: (state, action) => {
       const article = action.payload;
-      state.bookmarks = state.bookmarks.filter((b) => b.title !== article.title);
+      const match = (b) =>
+        (b.url && article.url ? b.url === article.url : b.title === article.title);
+      const index = state.bookmarks.findIndex(match);
+      if (index !== -1) {
+        state.bookmarks.splice(index, 1);
+      }
     },
     showBookmarksModal: (state) => {
       state.showBookmarksModal = true;

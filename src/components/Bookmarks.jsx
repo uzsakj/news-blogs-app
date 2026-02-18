@@ -2,6 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import './Bookmarks.css'
 import './Modal.css'
+import noImage from '../assets/images/no-img.png'
 import { removeBookmark, hideBookmarksModal } from '../store/bookmarksSlice'
 
 const Bookmarks = ({ show, onClose, onSelectArticle }) => {
@@ -19,16 +20,16 @@ const Bookmarks = ({ show, onClose, onSelectArticle }) => {
                 </span>
                 <h2 className="bookmarks-heading">Bookmarked News</h2>
                 <div className="bookmarks-list">
-                    {bookmarks.map((bookmark) => (
+                    {bookmarks.map((bookmark, index) => (
                         <div
                             className="bookmark-item"
-                            key={bookmark.title}
+                            key={bookmark.url ?? `${bookmark.title}-${index}`}
                             onClick={() => {
                                 onSelectArticle(bookmark);
                                 dispatch(hideBookmarksModal());
                             }}
                         >
-                            <img src={bookmark.image} alt={bookmark.title} />
+                            <img src={bookmark.image || noImage} alt={bookmark.title} />
                             <h3>{bookmark.title}</h3>
                             <span
                                 className="delete-button"

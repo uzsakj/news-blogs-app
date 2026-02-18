@@ -26,6 +26,7 @@ const persistConfig = {
     news: {
       selectedCategory: state.news.selectedCategory,
       searchQuery: state.news.searchQuery,
+      searchInput: '', // Reset on refresh - searchQuery holds the committed search
     },
     bookmarks: {
       bookmarks: state.bookmarks.bookmarks,
