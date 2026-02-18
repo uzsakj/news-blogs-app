@@ -8,6 +8,7 @@ import Weather from './Weather'
 import Calendar from './Calendar'
 import NewsModal from './NewsModal'
 import Bookmarks from './Bookmarks'
+import BlogsModal from './BlogsModal'
 
 const categories = [
     'general',
@@ -21,7 +22,7 @@ const categories = [
     'nation'
 ];
 
-const News = ({ onShowBlogs, blogs }) => {
+const News = ({ onShowBlogs, blogs, onEditBlog, selectedBlog, setSelectedBlog, onDeleteBlog }) => {
     const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
 
 
@@ -34,6 +35,7 @@ const News = ({ onShowBlogs, blogs }) => {
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [bookmarks, setBookmarks] = useState([]);
     const [showBookmarksModal, setShowBookmarksModal] = useState(false);
+    const [showBlogsModal, setShowBlogsModal] = useState(false);
 
 
 
@@ -89,6 +91,17 @@ const News = ({ onShowBlogs, blogs }) => {
             localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
             return updatedBookmarks;
         });
+    }
+
+
+    const handleBlogClick = (blog) => {
+        setSelectedBlog(blog);
+        setShowBlogsModal(true);
+    }
+
+    const closeBlogModal = () => {
+        setShowBlogsModal(false);
+        setSelectedBlog(null);
     }
 
 
@@ -198,14 +211,26 @@ const News = ({ onShowBlogs, blogs }) => {
                     <h1 className="my-blogs-heading">My Blogs</h1>
                     <div className="blog-posts">
                         {blogs.map((blog, index) => (
-                            <div className="blog-post" key={index}>
+                            <div
+                                className="blog-post"
+                                key={index}
+                                onClick={() => handleBlogClick(blog)}>
                                 <img src={blog.image || noImage} alt="Post Image" />
                                 <h3>{blog.title}</h3>
                                 <div className="post-buttons">
-                                    <button className="edit-post">
+                                    <button
+                                        className="edit-post"
+                                        onClick={() => {
+                                            onEditBlog(blog);
+                                        }}>
                                         <i className="bx bxs-edit"></i>
                                     </button>
-                                    <button className="delete-post" >
+                                    <button
+                                        className="delete-post"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteBlog(blog);
+                                        }}>
                                         <i className="bx bxs-x-circle"></i>
                                     </button>
 
@@ -214,6 +239,13 @@ const News = ({ onShowBlogs, blogs }) => {
                         ))}
 
                     </div>
+                    {selectedBlog && showBlogsModal && (
+                        <BlogsModal
+                            show={showBlogsModal}
+                            blog={selectedBlog}
+                            onClose={closeBlogModal}
+                        />
+                    )}
                 </div>
                 <div className="weather-calendar">
                     <Weather />

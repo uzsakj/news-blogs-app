@@ -4,35 +4,68 @@ import './Blogs.css'
 import userImg from '../assets/images/user.jpg'
 import noImage from '../assets/images/no-img.png'
 
-const Blogs = ({ onBack, onCreateBlog }) => {
+const Blogs = ({ onBack, onCreateBlog, editBlog, isEditing }) => {
 
-    const [showForm, setShowForm] = useState(false);
-    const [image, setImage] = useState(null);
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [showForm, setShowForm] = useState(!!(editBlog && isEditing));
+    const [image, setImage] = useState(editBlog?.image ?? null);
+    const [title, setTitle] = useState(editBlog?.title ?? '');
+    const [content, setContent] = useState(editBlog?.content ?? '');
+    const [submitted, setSubmitted] = useState(false);
+    const [titleValid, setTitleValid] = useState(true);
+    const [contentValid, setContentValid] = useState(true);
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const maxSize = 1 * 1024 * 1024; // 1MB
+
+            if (file.size > maxSize) {
+                alert('Image size must be less than 1MB');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 setImage(e.target.result);
             }
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
+    }
+
+    const handleTitleChange = (e) => {
+        setTitle(e.target.value);
+        setTitleValid(true);
+    }
+
+    const handleContentChange = (e) => {
+        setContent(e.target.value);
+        setContentValid(true);
     }
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (!title || !content) {
+            if (!title) setTitleValid(false);
+            if (!content) setContentValid(false);
+            return;
+        }
+
         const newBlog = {
             image: image || noImage,
             title,
             content
         }
-        onCreateBlog(newBlog);
+        onCreateBlog(newBlog, isEditing);
         setImage(null);
         setTitle('');
         setContent('');
         setShowForm(false);
+        setSubmitted(true);
+        setTimeout(() => {
+            setSubmitted(false);
+            onBack();
+        }, 3000);
     }
     return (
         <div className='blogs'>
@@ -41,44 +74,50 @@ const Blogs = ({ onBack, onCreateBlog }) => {
                 <p>Mary's Blog</p>
             </div>
             <div className="blogs-right">
-                {showForm ? (
-                    <div className="blogs-right-form">
-                        <h1>New Post</h1>
-                        <form onSubmit={handleSubmit}>
-                            <div className="img-upload">
-                                <label htmlFor="file-upload" className='file-upload'>
-                                    <i className="bx bx-upload"></i>Upload Image
-                                </label>
-                                <input
-                                    type="file"
-                                    id="file-upload"
-                                    className='file-input'
-                                    onChange={handleImageChange}
-                                    accept="image/*"
-                                />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder='Add Title (Max 60 Characters)'
-                                className='title-input'
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                                maxLength={60}
-                            />
-                            <textarea
-                                placeholder='Add Text'
-                                className='text-input'
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                required
-                            />
-                            <button type="submit" className='submit-btn'>Submit Button</button>
-                        </form>
-                    </div>
-                ) : (
-                    <button className="post-btn" onClick={() => setShowForm(true)}>Create New Post</button>
+                {!showForm && !submitted && (
+                    <button
+                        className="post-btn"
+                        onClick={() => setShowForm(true)}
+                    >Create New Post</button>
                 )}
+                {submitted && <p className='submission-message'>Post submitted!</p>}
+                <div className={`blogs-right-form ${showForm ? 'visible' : 'hidden'}`}>
+                    <h1>{isEditing ? 'Edit Post' : 'New Post'}</h1>
+                    <form onSubmit={handleSubmit}>
+                        <div className="img-upload">
+                            <label htmlFor="file-upload" className='file-upload'>
+                                <i className="bx bx-upload"></i>Upload Image
+                            </label>
+                            <input
+                                type="file"
+                                id="file-upload"
+                                className='file-input'
+                                onChange={handleImageChange}
+                                accept="image/*"
+                            />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder='Add Title (Max 60 Characters)'
+                            className={`title-input ${!titleValid ? 'invalid' : ''}`}
+                            value={title}
+                            maxLength={60}
+                            onChange={handleTitleChange}
+                        />
+                        <textarea
+                            placeholder='Add Text'
+                            className={`text-input ${!contentValid ? 'invalid' : ''}`}
+                            value={content}
+                            onChange={handleContentChange}
+                        />
+                        <button
+                            type="submit"
+                            className='submit-btn'>
+                            {isEditing ? 'Update Post' : 'Submit Post'}
+                        </button>
+                    </form>
+                </div>
+
 
                 <button className="blogs-close-btn" onClick={onBack}>
                     Back <i className="bx bx-chevron-right"></i>
