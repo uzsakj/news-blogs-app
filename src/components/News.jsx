@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import './News.css'
 import userImg from '../assets/images/user.jpg'
@@ -11,12 +11,12 @@ import Bookmarks from './Bookmarks'
 import BlogsModal from './BlogsModal'
 import { showBlogModal, deleteBlog } from '../store/blogSlice'
 import {
-  fetchNews,
   setSelectedCategory,
   setSearchQuery,
   setSearchInput,
   clearSearchInput,
 } from '../store/newsSlice'
+import { useGetNewsQuery } from '../store/newsApi'
 import {
   toggleBookmark,
   showBookmarksModal as openBookmarksModal,
@@ -39,29 +39,23 @@ const News = ({ onShowBlogs, onEditBlog }) => {
     const dispatch = useDispatch();
     const blogs = useSelector((state) => state.blogs.blogs);
     const showBlogsModal = useSelector((state) => state.blogs.showBlogsModal);
-    const headline = useSelector((state) => state.news.headline);
-    const news = useSelector((state) => state.news.news);
     const selectedCategory = useSelector((state) => state.news.selectedCategory);
     const searchInput = useSelector((state) => state.news.searchInput);
     const searchQuery = useSelector((state) => state.news.searchQuery);
-    const loading = useSelector((state) => state.news.loading);
-    const error = useSelector((state) => state.news.error);
     const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
+
+    const { data: articles = [], isLoading: loading, isError, error } = useGetNewsQuery(
+        { category: selectedCategory, searchQuery, apiKey, noImage },
+        { skip: !apiKey }
+    );
+
+    const headline = articles[0] ?? null;
+    const news = articles.slice(1, 7);
 
     const [showModal, setShowModal] = useState(false);
     const [selectedArticle, setSelectedArticle] = useState(null);
     const bookmarks = useSelector((state) => state.bookmarks.bookmarks);
     const showBookmarksModal = useSelector((state) => state.bookmarks.showBookmarksModal);
-
-    useEffect(() => {
-        if (!apiKey) return;
-        dispatch(fetchNews({
-            category: selectedCategory,
-            searchQuery,
-            apiKey,
-            noImage,
-        }));
-    }, [dispatch, selectedCategory, searchQuery, apiKey]);
 
     const handleCategoryChange = (e, category) => {
         e.preventDefault();
@@ -136,10 +130,10 @@ const News = ({ onShowBlogs, onEditBlog }) => {
                     {loading && (
                         <div className="news-loading">Loading news...</div>
                     )}
-                    {error && (
-                        <div className="news-error">{error}</div>
+                    {isError && (
+                        <div className="news-error">{error?.error ?? error?.data?.message ?? 'Failed to fetch news'}</div>
                     )}
-                    {!loading && !error && headline && (
+                    {!loading && !isError && headline && (
                         <div
                             className="headline"
                             onClick={() => handleArticleClick(headline)}
@@ -161,7 +155,7 @@ const News = ({ onShowBlogs, onEditBlog }) => {
                         </div>
                     )}
                     <div className="news-grid">
-                        {!loading && !error && news.map((article, index) => (
+                        {!loading && !isError && news.map((article, index) => (
                             <div
                                 className="news-grid-item"
                                 key={index}

@@ -4,11 +4,13 @@ import storage from 'redux-persist/lib/storage';
 import blogReducer from './blogSlice';
 import newsReducer from './newsSlice';
 import bookmarksReducer from './bookmarksSlice';
+import { newsApi } from './newsApi';
 
 const rootReducer = combineReducers({
   blogs: blogReducer,
   news: newsReducer,
   bookmarks: bookmarksReducer,
+  [newsApi.reducerPath]: newsApi.reducer,
 });
 
 const persistConfig = {
@@ -22,13 +24,8 @@ const persistConfig = {
       showBlogsModal: false,
     },
     news: {
-      cache: state.news.cache,
       selectedCategory: state.news.selectedCategory,
       searchQuery: state.news.searchQuery,
-      headline: null,
-      news: [],
-      loading: false,
-      error: null,
     },
     bookmarks: {
       bookmarks: state.bookmarks.bookmarks,
@@ -44,14 +41,10 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [
-          'persist/PERSIST',
-          'persist/REHYDRATE',
-          'news/fetchNews/fulfilled',
-          'news/fetchNews/rejected',
-        ],
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredPaths: [newsApi.reducerPath],
       },
-    }),
+    }).concat(newsApi.middleware),
 });
 
 export const persistor = persistStore(store);
